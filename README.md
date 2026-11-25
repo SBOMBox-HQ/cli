@@ -41,6 +41,17 @@ uv run sbombox --help
 
 Releases run in the `pypi` environment; add required reviewers there if a release should need a second approval.
 
+### First release
+
+PyPI keeps only one *pending* trusted publisher per repository, workflow and environment, so the two projects are set up one after the other:
+
+1. On pypi.org, under **Account → Publishing**, add a pending publisher for `sbombox-core`: owner `SBOMBox-HQ`, repository `cli`, workflow `publish.yml`, environment `pypi`.
+2. Push the first tag. The workflow publishes `sbombox-core`, which creates the project, then fails on `sbombox`. That is expected.
+3. Add the same publisher for `sbombox`. PyPI now accepts it, because the `sbombox-core` one is no longer pending.
+4. Re-run the failed jobs of that workflow run. `sbombox-core` is skipped as already published, `sbombox` is published, and the GitHub release is created.
+
+Later releases need nothing beyond pushing the tag.
+
 ## Security
 
 Report vulnerabilities privately, as described in [SECURITY.md](SECURITY.md).

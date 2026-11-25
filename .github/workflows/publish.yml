@@ -16,8 +16,10 @@ name: Publish to PyPI
 #
 # One-time setup: on pypi.org add a trusted publisher for both projects
 # (sbombox-core and sbombox): owner SBOMBox-HQ, repository cli, workflow
-# publish.yml, environment pypi. Add required reviewers to the `pypi`
-# environment if releases should need a second person's approval.
+# publish.yml, environment pypi. PyPI allows only one *pending* publisher per
+# configuration, so the first release takes two steps (README.md, "First
+# release"). Add required reviewers to the `pypi` environment if releases
+# should need a second person's approval.
 on:
   push:
     tags: ["v*"]
@@ -93,7 +95,25 @@ jobs:
         with:
           name: dist
           path: dist/
-      - uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086 # release/v1
+      # sbombox-core goes first: the CLI depends on it, and on the very first
+      # release only sbombox-core can have a (pending) trusted publisher - see
+      # "First release" in README.md. skip-existing makes a re-run after a
+      # partial publish safe; the tag check above stops a version being reused.
+      - name: Split packages
+        run: |
+          mkdir -p pkg/core pkg/cli
+          mv dist/sbombox_core-* pkg/core/
+          mv dist/sbombox-* pkg/cli/
+      - name: Publish sbombox-core
+        uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086 # release/v1
+        with:
+          packages-dir: pkg/core/
+          skip-existing: true
+      - name: Publish sbombox
+        uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086 # release/v1
+        with:
+          packages-dir: pkg/cli/
+          skip-existing: true
 
   release:
     needs: publish
