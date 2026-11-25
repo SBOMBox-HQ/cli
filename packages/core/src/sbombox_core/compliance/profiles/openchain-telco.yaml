@@ -1,0 +1,57 @@
+name: OpenChain Telco SBOM Guide
+version: "1.0"
+description: >
+  OpenChain Telco SBOM Guide - extends NTIA minimum elements with
+  telco-specific requirements for supplier contact, component source,
+  and export classification.
+requirements:
+  - id: oct-1
+    title: "Component name"
+    section_ref: "1.1"
+    level: required
+    check: name_present
+  - id: oct-2
+    title: "Component version"
+    section_ref: "1.2"
+    level: required
+    check: version_present
+  - id: oct-3
+    title: "Component identifier (purl)"
+    section_ref: "1.3"
+    level: required
+    check: purl_present
+  - id: oct-4
+    title: "Supplier / author"
+    section_ref: "1.4"
+    level: required
+    check: supplier_present
+  - id: oct-5
+    title: "Dependency relationship"
+    section_ref: "1.5"
+    level: required
+    check: dependency_graph
+  - id: oct-6
+    title: "SBOM timestamp"
+    section_ref: "1.6"
+    level: required
+    check: metadata_timestamp
+  - id: oct-7
+    title: "Supplier contact information"
+    section_ref: "2.1"
+    level: required
+    check: supplier_present
+  - id: oct-8
+    title: "Component source URL"
+    section_ref: "2.2"
+    level: required
+    check: purl_present
+  - id: oct-9
+    title: "Hash digests for integrity"
+    section_ref: "3.1"
+    level: required
+    check: hashes_present
+  - id: oct-10
+    title: "License information"
+    section_ref: "3.2"
+    level: optional
+    check: licenses_present

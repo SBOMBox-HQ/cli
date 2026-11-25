@@ -1,0 +1,56 @@
+name: CRA Readiness
+version: "1.0"
+description: >
+  EU Cyber Resilience Act (CRA) - SBOM readiness check.  Verifies that the
+  SBOM contains the data elements needed for CRA Annex I compliance.
+requirements:
+  - id: cra-1
+    title: "Component name"
+    section_ref: "I.1"
+    level: required
+    check: name_present
+  - id: cra-2
+    title: "Component version"
+    section_ref: "I.2"
+    level: required
+    check: version_present
+  - id: cra-3
+    title: "Component purl"
+    section_ref: "I.3"
+    level: required
+    check: purl_present
+  - id: cra-4
+    title: "Supplier information"
+    section_ref: "I.4"
+    level: required
+    check: supplier_present
+  - id: cra-5
+    title: "Hash digests"
+    section_ref: "II.1"
+    level: required
+    check: hashes_present
+  - id: cra-6
+    title: "License information"
+    section_ref: "II.2"
+    level: required
+    check: licenses_present
+  - id: cra-7
+    title: "Dependency graph"
+    section_ref: "III.1"
+    level: required
+    check: dependency_graph
+  - id: cra-8
+    title: "SBOM timestamp"
+    section_ref: "IV.1"
+    level: required
+    check: metadata_timestamp
+  - id: cra-9
+    title: "Root component"
+    section_ref: "IV.2"
+    level: required
+    check: root_component
+  - id: cra-10
+    title: "No embedded vulnerability claims"
+    section_ref: "V.1"
+    level: optional
+    check: no_embedded_vulns

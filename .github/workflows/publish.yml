@@ -1,0 +1,118 @@
+name: Publish to PyPI
+
+# Push a tag like `v0.1.0` to publish sbombox-core and sbombox (the CLI) to
+# PyPI. https://sbombox.com/install.sh installs whatever is published here.
+#
+# What a release leaves behind, for anyone auditing it later:
+#   * PyPI uploads via trusted publishing (no stored token) with PEP 740
+#     attestations, plus a GitHub build-provenance attestation for each file
+#     (`gh attestation verify <file> --repo sbombox-hq/cli`).
+#   * A GitHub Release with the wheels, sdists, SHA256SUMS and the CLI's own
+#     SBOM, generated and scored by the CLI being released.
+#
+# After a release, the API's /v1/meta/cli reports the newest PyPI release as
+# current unless CLI_LATEST_VERSION is set on the API. To force everyone off an
+# old or unsafe version, raise CLI_MIN_SUPPORTED_VERSION there.
+#
+# One-time setup: on pypi.org add a trusted publisher for both projects
+# (sbombox-core and sbombox): owner SBOMBox-HQ, repository cli, workflow
+# publish.yml, environment pypi. Add required reviewers to the `pypi`
+# environment if releases should need a second person's approval.
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      id-token: write      # build-provenance attestation
+      attestations: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6
+      - name: Check tag matches package versions
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          for f in packages/core/pyproject.toml packages/cli/pyproject.toml; do
+            v=$(sed -n 's/^version = "\(.*\)"/\1/p' "$f" | head -1)
+            [ "$v" = "$tag" ] || { echo "::error file=$f::$f is $v, tag is $tag"; exit 1; }
+          done
+      - name: Test before publishing
+        run: |
+          uv sync --all-packages --all-extras --frozen
+          uv run pytest
+      - run: uv build --package sbombox-core -o dist
+      - run: uv build --package sbombox -o dist
+      - name: Smoke-test the CLI wheel
+        run: |
+          uv tool install --find-links dist sbombox
+          sbombox --version
+      - name: SBOM of the release, made by the release
+        run: |
+          # The released CLI is already installed; the installer adds only the
+          # generator (syft).
+          curl -fsSL https://sbombox.com/install.sh | SBOMBOX_SKIP_CLI=1 SBOMBOX_NO_MODIFY_PATH=1 sh
+          mkdir -p release
+          sbombox generate --dir packages/cli --output release/sbombox-cli.cdx.json
+          sbombox score release/sbombox-cli.cdx.json --format detailed
+      - name: Checksums
+        run: (cd dist && sha256sum -- *) > release/SHA256SUMS
+      - uses: actions/attest-build-provenance@e8998f949152b193b063cb0ec769d69d929409be # v2
+        with:
+          subject-path: "dist/*"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: dist
+          path: dist/
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: release-extras
+          path: release/
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: dist
+          path: dist/
+      - uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086 # release/v1
+
+  release:
+    needs: publish
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          path: assets/
+          merge-multiple: true
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          gh release create "$TAG" assets/* \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "SBOMBox CLI ${TAG#v}" \
+            --generate-notes \
+            --verify-tag

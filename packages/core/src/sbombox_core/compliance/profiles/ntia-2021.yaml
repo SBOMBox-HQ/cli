@@ -1,0 +1,42 @@
+name: NTIA Minimum Elements
+version: "2021"
+description: >
+  The U.S. National Telecommunications and Information Administration (NTIA)
+  defined seven minimum data elements every SBOM should contain.
+  See: https://www.ntia.gov/report/federal-register-notice-cybersecurity-supply-chain
+requirements:
+  - id: ntia-1
+    title: "Component name"
+    section_ref: "1.1"
+    level: required
+    check: name_present
+  - id: ntia-2
+    title: "Component version"
+    section_ref: "1.2"
+    level: required
+    check: version_present
+  - id: ntia-3
+    title: "Component identifier (purl)"
+    section_ref: "1.3"
+    level: required
+    check: purl_present
+  - id: ntia-4
+    title: "Supplier / author"
+    section_ref: "1.4"
+    level: required
+    check: supplier_present
+  - id: ntia-5
+    title: "Dependency relationship"
+    section_ref: "1.5"
+    level: required
+    check: dependency_graph
+  - id: ntia-6
+    title: "SBOM timestamp"
+    section_ref: "1.6"
+    level: required
+    check: metadata_timestamp
+  - id: ntia-7
+    title: "SBOM authors / root component"
+    section_ref: "1.7"
+    level: optional
+    check: root_component

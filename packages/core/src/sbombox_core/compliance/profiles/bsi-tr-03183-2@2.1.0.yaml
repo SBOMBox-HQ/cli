@@ -1,0 +1,57 @@
+name: BSI TR-03183-2
+version: "2.1.0"
+description: >
+  BSI Technical Guideline TR-03183-2 v2.1.0 - Software Bill of Materials (SBOM)
+  for critical infrastructure operators.  Defines mandatory and optional
+  requirements for SBOM content and structure.
+requirements:
+  - id: bsi-1
+    title: "Component name"
+    section_ref: "3.1"
+    level: required
+    check: name_present
+  - id: bsi-2
+    title: "Component version"
+    section_ref: "3.2"
+    level: required
+    check: version_present
+  - id: bsi-3
+    title: "Component purl"
+    section_ref: "3.3"
+    level: required
+    check: purl_present
+  - id: bsi-4
+    title: "Supplier information"
+    section_ref: "3.4"
+    level: required
+    check: supplier_present
+  - id: bsi-5
+    title: "Hash digests"
+    section_ref: "4.1"
+    level: required
+    check: hashes_present
+  - id: bsi-6
+    title: "License information"
+    section_ref: "4.2"
+    level: required
+    check: licenses_present
+  - id: bsi-7
+    title: "Dependency graph"
+    section_ref: "5.1"
+    level: required
+    check: dependency_graph
+  - id: bsi-8
+    title: "SBOM timestamp"
+    section_ref: "6.1"
+    level: required
+    check: metadata_timestamp
+  - id: bsi-9
+    title: "Root component"
+    section_ref: "6.2"
+    level: required
+    check: root_component
+  - id: bsi-10
+    title: "No embedded vulnerability claims"
+    section_ref: "7.1"
+    level: optional
+    check: no_embedded_vulns

@@ -1,0 +1,51 @@
+name: FSCT SBOM Quality Criteria
+version: "3"
+description: >
+  Fraunhofer SBOM Quality Criteria v3 - defines quality levels for SBOMs
+  covering format, completeness, dependency graph, and metadata.
+requirements:
+  - id: fsct-1
+    title: "SBOM format (CycloneDX or SPDX)"
+    section_ref: "1"
+    level: required
+    check: valid_format
+  - id: fsct-2
+    title: "Component name"
+    section_ref: "2.1"
+    level: required
+    check: name_present
+  - id: fsct-3
+    title: "Component version"
+    section_ref: "2.2"
+    level: required
+    check: version_present
+  - id: fsct-4
+    title: "Component supplier"
+    section_ref: "2.3"
+    level: required
+    check: supplier_present
+  - id: fsct-5
+    title: "Component purl"
+    section_ref: "2.4"
+    level: required
+    check: purl_present
+  - id: fsct-6
+    title: "License information"
+    section_ref: "2.5"
+    level: required
+    check: licenses_present
+  - id: fsct-7
+    title: "Dependency graph"
+    section_ref: "3.1"
+    level: required
+    check: dependency_graph
+  - id: fsct-8
+    title: "SBOM metadata (author, timestamp, tool)"
+    section_ref: "4.1"
+    level: required
+    check: metadata_timestamp
+  - id: fsct-9
+    title: "Hash digests"
+    section_ref: "4.2"
+    level: optional
+    check: hashes_present

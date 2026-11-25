@@ -1,0 +1,36 @@
+name: BSI TR-03183-2
+version: "1.1"
+description: >
+  BSI Technical Guideline TR-03183-2 v1.1 - Original version focusing on
+  component identification, dependency relationships, and integrity.
+requirements:
+  - id: bsi-1
+    title: "Component name"
+    section_ref: "2.1"
+    level: required
+    check: name_present
+  - id: bsi-2
+    title: "Component version"
+    section_ref: "2.2"
+    level: required
+    check: version_present
+  - id: bsi-3
+    title: "Supplier / author"
+    section_ref: "2.3"
+    level: required
+    check: supplier_present
+  - id: bsi-4
+    title: "Dependency relationships"
+    section_ref: "3.1"
+    level: required
+    check: dependency_graph
+  - id: bsi-5
+    title: "License information"
+    section_ref: "3.2"
+    level: required
+    check: licenses_present
+  - id: bsi-6
+    title: "Hash integrity"
+    section_ref: "4.1"
+    level: required
+    check: hashes_present

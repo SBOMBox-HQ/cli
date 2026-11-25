@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Lint, test and build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6
+        with:
+          enable-cache: true
+      # Errors only (syntax, undefined names); the full rule set still has
+      # pre-existing findings. Tighten this as they are cleaned up.
+      - run: uvx ruff check packages --select E9,F63,F7,F82 --output-format github
+      - run: uv sync --all-packages --all-extras --frozen
+      - run: uv run pytest --junitxml=reports/tests.xml
+      - name: Build wheels
+        run: |
+          uv build --package sbombox-core -o dist
+          uv build --package sbombox -o dist
+      - name: Smoke-test the CLI wheel
+        run: |
+          uv tool install --find-links dist sbombox
+          sbombox --version
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: test-results
+          path: reports/
+          retention-days: 30

@@ -1,0 +1,106 @@
+name: CISA SBOM Minimum Elements
+version: "2026"
+description: >
+  2026 Minimum Elements for a Software Bill of Materials (CISA with NSA, FBI
+  and international partners, July 2026). Replaces the NTIA 2021 minimum
+  elements and the August 2025 CISA draft. Seventeen data fields: nine about
+  the SBOM document and eight for every component. Guidance, not regulation.
+# section_ref groups: "SBOM" = document-level data field, "Component" =
+# per-component data field, "Practice" = minimum practice (not a data field).
+requirements:
+  # --- SBOM-level data fields ------------------------------------------------
+  - id: cisa26-sbom-author
+    title: "SBOM Author"
+    section_ref: "SBOM"
+    level: required
+    check: sbom_author
+  - id: cisa26-sbom-timestamp
+    title: "SBOM Timestamp"
+    section_ref: "SBOM"
+    level: required
+    check: metadata_timestamp
+  # A detached signature (for example a cosign or in-toto attestation) also
+  # satisfies this element but cannot be seen in the document itself, so the
+  # check is optional: it never fails an SBOM that is signed out of band.
+  - id: cisa26-sbom-signature
+    title: "SBOM Author Signature (embedded)"
+    section_ref: "SBOM"
+    level: optional
+    check: sbom_signature
+  - id: cisa26-format-name
+    title: "SBOM Data Format Name"
+    section_ref: "SBOM"
+    level: required
+    check: format_name
+  - id: cisa26-format-version
+    title: "SBOM Data Format Version"
+    section_ref: "SBOM"
+    level: required
+    check: format_version
+  - id: cisa26-generation-context
+    title: "SBOM Generation Context"
+    section_ref: "SBOM"
+    level: required
+    check: generation_context
+  - id: cisa26-tool-name
+    title: "SBOM Tool Name"
+    section_ref: "SBOM"
+    level: required
+    check: tool_name
+  - id: cisa26-tool-version
+    title: "SBOM Tool Version"
+    section_ref: "SBOM"
+    level: required
+    check: tool_version
+  - id: cisa26-sbom-version
+    title: "SBOM Version"
+    section_ref: "SBOM"
+    level: required
+    check: sbom_version
+  # --- Component-level data fields -------------------------------------------
+  - id: cisa26-component-producer
+    title: "Component Producer"
+    section_ref: "Component"
+    level: required
+    check: supplier_present
+  - id: cisa26-component-name
+    title: "Component Name"
+    section_ref: "Component"
+    level: required
+    check: name_present
+  - id: cisa26-component-version
+    title: "Component Version"
+    section_ref: "Component"
+    level: required
+    check: version_present
+  - id: cisa26-component-identifiers
+    title: "Component Identifiers"
+    section_ref: "Component"
+    level: required
+    check: identifier_present
+  - id: cisa26-dependency-relationship
+    title: "Component Dependency Relationship"
+    section_ref: "Component"
+    level: required
+    check: dependency_graph
+  - id: cisa26-hash-value
+    title: "Component Hash Value"
+    section_ref: "Component"
+    level: required
+    check: hashes_present
+  - id: cisa26-hash-algorithm
+    title: "Component Hash Algorithm"
+    section_ref: "Component"
+    level: required
+    check: hash_algorithm
+  - id: cisa26-component-license
+    title: "Component License"
+    section_ref: "Component"
+    level: required
+    check: licenses_present
+  # --- Minimum practices -------------------------------------------------------
+  - id: cisa26-coverage
+    title: "Coverage: every component appears in the dependency graph"
+    section_ref: "Practice"
+    level: optional
+    check: dependency_coverage
