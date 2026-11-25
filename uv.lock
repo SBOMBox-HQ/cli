@@ -1675,7 +1675,7 @@ wheels = [
 
 [[package]]
 name = "sbombox"
-version = "0.1.0"
+version = "0.1.1"
 source = { editable = "packages/cli" }
 dependencies = [
     { name = "httpx" },
@@ -1715,7 +1715,7 @@ provides-extras = ["sigstore", "dev"]
 
 [[package]]
 name = "sbombox-core"
-version = "0.1.0"
+version = "0.1.1"
 source = { editable = "packages/core" }
 dependencies = [
     { name = "httpx" },

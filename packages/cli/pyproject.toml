@@ -1,6 +1,6 @@
 [project]
 name = "sbombox"
-version = "0.1.0"
+version = "0.1.1"
 description = "SBOMBox CLI - generate, score, and manage SBOMs from the command line"
 readme = "README.md"
 requires-python = ">=3.12"
