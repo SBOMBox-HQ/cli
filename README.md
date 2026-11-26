@@ -23,6 +23,8 @@ uv tool install sbombox
 
 Docs: [sbombox.com/docs/cli](https://sbombox.com/docs/cli). In CI, use the [GitHub Action](https://github.com/sbombox-hq/action).
 
+The CLI sends anonymous usage data and asks before the first run in a terminal; see [Usage data](packages/cli/README.md#usage-data) for what is sent and how to turn it off.
+
 ## Develop
 
 Requires [uv](https://docs.astral.sh/uv/) and Python 3.12+.

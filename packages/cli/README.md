@@ -47,6 +47,23 @@ Run `sbombox <command> --help` for options.
 
 Compliance rulesets: NTIA minimum elements (`ntia-2021`), CISA (`cisa-2025`, `cisa-2026`), EU CRA readiness (`cra-readiness`), BSI TR-03183-2 (`bsi-tr-03183-2@2.1.0` and earlier), FSCT v3 (`fsct-v3`) and OpenChain Telco (`openchain-telco`).
 
+## Usage data
+
+To learn which commands are used and where they fail, the CLI sends anonymous usage data to SBOMBox: the command name, whether it succeeded, its exit code and duration, the CLI version, the OS, the CI provider if any, and a random installation ID. It never sends file names or paths, project or repository names, account details, tokens, or anything from an SBOM. Events are sent in small batches at most once an hour and never slow a command down.
+
+The first time you run `sbombox` in a terminal it asks whether to share this. You can change your answer at any time:
+
+| To | Do this |
+|---|---|
+| Turn it off for your user | `sbombox config --telemetry off` |
+| Turn it back on | `sbombox config --telemetry on` |
+| See whether it is on, and why | `sbombox config --telemetry status` |
+| Skip it for one run | `sbombox --no-telemetry <command>` |
+| Turn it off in CI or a container | `SBOMBOX_NO_TELEMETRY=1` or `DO_NOT_TRACK=1` |
+| Turn it off for a repository | `telemetry: false` in `.sbombox.yml` |
+
+In CI nothing asks; set one of the environment variables to opt out. Self-hosted installs send it to their own API (`SBOMBOX_API_URL`). Details: [sbombox.com/privacy](https://sbombox.com/privacy#tools).
+
 ## Links
 
 - Docs: [sbombox.com/docs/cli](https://sbombox.com/docs/cli)
