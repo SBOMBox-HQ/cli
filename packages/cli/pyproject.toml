@@ -22,7 +22,7 @@ sigstore = ["sbombox-core[sigstore]"]
 dev = ["pytest>=8.0", "ruff>=0.4", "mypy>=1.10", "cyclonedx-bom>=7.0"]
 
 [project.scripts]
-sbombox = "sbombox_cli.main:app"
+sbombox = "sbombox_cli.main:run"
 
 [project.urls]
 Homepage = "https://sbombox.com"

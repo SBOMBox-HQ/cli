@@ -18,6 +18,8 @@ PUBLISH = "Publish"
 CONFIGURE = "Configure"
 
 _UPDATE_CHECK_REGISTERED = False
+# Set by the callback for run(): which command ran, and the --no-telemetry flag.
+_INVOKED: dict = {"command": None, "no_telemetry": False, "api_url": None, "repo_config": None}
 
 
 def version_callback(value: bool) -> None:
@@ -28,10 +30,15 @@ def version_callback(value: bool) -> None:
 
 @app.callback()
 def main(
+    ctx: typer.Context,
     version: bool = typer.Option(
         False, "--version", "-V",
         callback=version_callback, is_eager=True,
         help="Show the sbombox version and exit.",
+    ),
+    no_telemetry: bool = typer.Option(
+        False, "--no-telemetry",
+        help="Send no anonymous usage data for this run. To stop for good: sbombox config --telemetry off.",
     ),
 ) -> None:
     """Generate, assess and publish software bills of materials (SBOMs)."""
@@ -43,9 +50,16 @@ def main(
     from sbombox_cli.update_check import check_for_updates
 
     try:
-        api_url = load_config().api_url
+        config = load_config()
+        api_url = config.api_url
     except Exception:  # noqa: BLE001 - a broken config is reported by the command itself
         return
+
+    from sbombox_cli import telemetry
+
+    _INVOKED.update(command=ctx.invoked_subcommand, no_telemetry=no_telemetry, api_url=api_url,
+                    repo_config=dict(config._raw))
+    telemetry.ask_once(ctx.invoked_subcommand, _INVOKED["repo_config"], no_telemetry)
     global _UPDATE_CHECK_REGISTERED
     if not _UPDATE_CHECK_REGISTERED:
         _UPDATE_CHECK_REGISTERED = True
@@ -94,5 +108,25 @@ from sbombox_cli.commands.upgrade import upgrade
 app.command("upgrade", rich_help_panel=CONFIGURE, help="Upgrade to the current version published by SBOMBox.")(upgrade)
 app.command("config", rich_help_panel=CONFIGURE, help="Print the default .sbombox.yml, or write it with --init.")(config_cmd)
 
+def run() -> None:
+    """Console entry point: runs the app, then records the command for usage telemetry."""
+    import time
+
+    started = time.monotonic()
+    exit_code = 1
+    try:
+        app()
+        exit_code = 0
+    except SystemExit as exc:
+        exit_code = exc.code if isinstance(exc.code, int) else (0 if exc.code is None else 1)
+        raise
+    finally:
+        if _INVOKED["command"] and _INVOKED["api_url"]:
+            from sbombox_cli import telemetry
+
+            telemetry.record(_INVOKED["command"], exit_code, time.monotonic() - started, _INVOKED["api_url"],
+                             _INVOKED["repo_config"], _INVOKED["no_telemetry"])
+
+
 if __name__ == "__main__":  # pragma: no cover
-    app()
+    run()
