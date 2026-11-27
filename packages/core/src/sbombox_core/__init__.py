@@ -52,7 +52,7 @@ from sbombox_core.validate import (
 #: Kept in step with ``[project].version`` in ``pyproject.toml``.  A literal
 #: rather than ``importlib.metadata`` so the value is still correct when the
 #: package is imported straight from a source tree.
-__version__ = "0.1.1"
+__version__ = "0.1.2"
 
 __all__ = [
     "Component",
